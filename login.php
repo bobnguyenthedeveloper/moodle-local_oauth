@@ -29,14 +29,17 @@ $clientid = required_param('client_id', PARAM_RAW);
 $responsetype = required_param('response_type', PARAM_RAW);
 $scope = optional_param('scope', false, PARAM_TEXT);
 $state = optional_param('state', false, PARAM_TEXT);
-$url = $CFG->wwwroot . '/local/oauth/login.php?client_id=' . $clientid . '&response_type=' . $responsetype;
+
+$url = new moodle_url('/local/oauth/login.php');
+$url->param('client_id', $clientid);
+$url->param('response_type', $responsetype);
 
 if ($scope) {
-    $url .= '&scope=' . $scope;
+	$url->param('scope', $scope);
 }
 
 if ($state) {
-    $url .= '&state=' . $state;
+	$url->param('state', $state);
 }
 
 $PAGE->set_url($CFG->wwwroot . '/local/oauth/login.php');
@@ -74,6 +77,6 @@ if (isloggedin() && !isguestuser()) {
     $server->handleAuthorizeRequest($request, $response, $isauthorized, $USER->id);
     $response->send();
 } else {
-    $SESSION->wantsurl = $url;
+    $SESSION->wantsurl = $url->out();
     redirect(new moodle_url('/login/index.php'));
 }
